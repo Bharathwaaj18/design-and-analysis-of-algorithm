@@ -1,0 +1,59 @@
+# include <stdio.h>
+# include <stdlib.h>
+# include <time.h>
+
+void Exch(int *p, int *q) {
+    int temp = *p;
+    *p = *q;
+    *q = temp;
+}
+
+void QuickSort(int a[], int low, int high) {
+    int i = low, j = high, key = low;
+    if (low >= high)
+        return;
+
+    while (i <= j) {
+        while (a[i] <= a[key] && i <= high)
+            i++;
+        while (a[j] > a[key] && j >= low)
+            j--;
+        if (i < j)
+            Exch(&a[i], &a[j]);
+    }
+    Exch(&a[j], &a[key]);
+    QuickSort(a, low, j - 1);
+    QuickSort(a, j + 1, high);
+}
+
+int main() {
+    int n, a[1000], k;
+    clock_t st, et;
+    double ts;
+
+    printf("\nEnter How many Numbers: ");
+    scanf("%d", &n);
+
+    srand(time(NULL)); // Seed the random number generator
+
+    printf("\nThe Random Numbers are:\n");
+    for (k = 0; k < n; k++) {
+        a[k] = rand();
+        printf("%d\t", a[k]);
+    }
+
+    st = clock();
+    QuickSort(a, 0, n - 1);
+    et = clock();
+
+    ts = (double)(et - st) / CLOCKS_PER_SEC;
+
+    printf("\nSorted Numbers are:\n ");
+    for (k = 0; k < n; k++)
+        printf("%d\t", a[k]);
+
+    printf("\nThe time taken is %e", ts);
+
+    return 0;
+}
+
