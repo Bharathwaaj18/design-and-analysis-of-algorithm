@@ -1,0 +1,61 @@
+% Load the image data
+img_data = imread('download (1).jpeg');
+img_data = double(img_data) / 255;
+
+% Reshape the image data to be a 2D array where each row is a flattened pixel value
+% For RGB images, the 3rd dimension will be 3 (R, G, B channels).
+img_data = reshape(img_data, [], size(img_data, 3));
+
+% Define the number of neurons in the feature map
+n_neurons = 10;
+
+% Initialize the weights and learning rate
+% The weight matrix should have 'n_neurons' rows and 'size(img_data, 2)' columns
+% because each input vector has 'size(img_data, 2)' features (3 for RGB images).
+weights = rand(n_neurons, size(img_data, 2));  % Initialize weights
+
+learning_rate = 0.1;
+
+% Train the Kohonen network
+for epoch = 1:100
+    for j = 1:size(img_data, 1)
+        x = img_data(j, :);  % Input vector (a flattened pixel)
+        
+        % Calculate distances from input vector to all weight vectors
+        distances = zeros(1, n_neurons);
+        for k = 1:n_neurons
+            y = weights(k, :);
+            distances(k) = norm(x - y);
+        end
+        
+        % Find the winning neuron (closest weight vector)
+        [~, winner_index] = min(distances);
+        
+        % Update the winning neuron's weight vector
+        weights(winner_index, :) = weights(winner_index, :) + learning_rate * (x - weights(winner_index, :));
+    end
+    
+    % Reduce the learning rate over time
+    learning_rate = learning_rate * 0.9;
+end
+
+% Test the Kohonen network
+test_img = imread('test_image.jpg');
+test_img = double(test_img) / 255;
+
+% Reshape the test image similarly to the training data
+test_img = reshape(test_img, [], size(test_img, 3));  % Ensure the test image has the correct dimensions
+
+% Choose one test sample for classification (e.g., the first pixel/sample)
+test_sample = test_img(1, :);
+
+% Calculate distances from the test sample to all neurons
+distances = zeros(1, n_neurons);
+for i = 1:n_neurons
+    y = weights(i, :);
+    distances(i) = norm(test_sample - y);
+end
+
+% Find the winning neuron for the test sample
+[~, winner_index] = min(distances);
+fprintf('Test image belongs to neuron %d\n', winner_index);
